@@ -7,11 +7,13 @@
    [gniazdo.core :as ws]
    [clj-http.client :as http]))
 
+(def STREAM-BUFFER-SIZE 10000)
+
 (def TRADIER-CREATE-SESSION-URL "https://api.tradier.com/v1/markets/events/session")
 
-(def TRADIER-OPTIONS-URL "https://api.tradier.com/v1/markets/options/lookup")
-
 (def TRADIER-WS-URL "wss://ws.tradier.com/v1/markets/events")
+
+(def TRADIER-STREAM-URL "https://stream.tradier.com/v1/markets/events")
 
 (defn get-tradier-session-id
   [auth-key]
@@ -21,15 +23,35 @@
         info-json (json/read-str (:body ws-session-info) :key-fn keyword)]
     (:sessionid (:stream info-json))))
 
-;(def ws-session
-;  (get-tradier-session-id tradier-key))
+;;was just testing with this
+(defn get-stream-connection
+  [symbols tradier-session-id tradier-auth-key]
+  (let [out-chan (a/chan)]
+    (a/go
+      (let [response (http/post TRADIER-STREAM-URL {:headers {:Authorization (str "Bearer " tradier-auth-key)
+                                                              :Accept "application/json"}
+                                                    :form-params {:sessionid tradier-session-id
+                                                                  :filter ["trade","tradex"]
+                                                                  :symbols (string/join "," symbols)
+                                                                  :linebreak true}
+                                                    :as :reader})]
+        (timbre/info (str "TRADIER CONNECTION: " (:status response)))
+        (with-open [reader (:body response)]
+          (dorun (for [item (line-seq reader)]
+                   (do
+                     (println item)
+                     (a/put! out-chan item)))))
+        (a/close! out-chan)))
+    out-chan))
 
 (defn get-ws-connection
   [symbols tradier-session-id]
   (let [str-symbols (string/join "," symbols)]
-    (timbre/info (str "Setting up Tradier connection for symbols: " str-symbols)))
+    (timbre/info (str "Setting up Tradier connection for "
+                      (count symbols)
+                      " symbols")))
 
-  (let [out-chan (a/chan (a/dropping-buffer 100))
+  (let [out-chan (a/chan (a/dropping-buffer STREAM-BUFFER-SIZE))
         chan-status (a/chan)
         ws-payload (json/write-str {:symbols symbols
                                     :sessionid tradier-session-id
@@ -50,10 +72,11 @@
                              (a/put! chan-status ::release))
                  :on-error (fn [error]
                              (timbre/error (str "WS: " error))
-                             (timbre/info "Closing tradier-stream out-chan")
+                             (timbre/error "encountered an error closing tradier-stream out-chan")
                              (a/close! out-chan)
                              (a/put! chan-status ::close))
                  )]
+
     (ws/send-msg socket ws-payload)
 
     ;;if out-chan is closed, we want to clean-up our ws client
@@ -62,6 +85,7 @@
       (if (identical? ::close (a/<! chan-status))
           (ws/close socket))
       (a/close! chan-status)) ;close the status chan regardless
+
     out-chan))
 
 ;; (def ochan

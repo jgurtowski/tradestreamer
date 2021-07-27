@@ -7,7 +7,7 @@
    [clj-compress.core :as c]))
 
 (defn bzipper
-  "chunk-size (in bytes) is pre-compressed chunk size. Dealing w/ low level java is
+  "chunk-size (in chars) is pre-compressed chunk size. Dealing w/ low level java is
   too big of a pain right now
   "
   [in-chan chunk-size]

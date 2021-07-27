@@ -14,4 +14,4 @@ COPY src /tradestreamer/src
 COPY deps.edn /tradestreamer
 
 WORKDIR /tradestreamer
-CMD clojure src/main.clj
+CMD clojure -m main

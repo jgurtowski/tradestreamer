@@ -13,13 +13,12 @@
       (if-not (nil? data)
         (do
           (try
-            (timbre/info (str "Uploading data to s3. bytes: " (count data)))
-            (aws/invoke s3 {:op :PutObject
-                            :request {:Bucket bucket
-                                      :Key (str (.toEpochSecond (ZonedDateTime/now))
-                                                file-extension)
-                                      :LocationConstraint "us-east-1"
-                                      :Body data}})
+            (timbre/info (str "Uploading data to s3 bucket " bucket " . bytes: " (count data)))
+            (timbre/info (aws/invoke s3 {:op :PutObject
+                                         :request {:Bucket bucket
+                                                   :Key (str (.toEpochSecond (ZonedDateTime/now))
+                                                             file-extension)
+                                                   :LocationConstraint "us-east-1"
+                                                   :Body data}}))
             (catch Exception e (timbre/error (str e))))
-          (recur (a/<! in-chan)))
-        (timbre/info "s3-put-chan shutting down")))))
+          (recur (a/<! in-chan)))))))

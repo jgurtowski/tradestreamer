@@ -1,0 +1,2 @@
+
+Pull streaming quotes from tradier, compress with bzip2, push to s3

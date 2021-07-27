@@ -1,0 +1,48 @@
+* Design Doc
+Websocket stream
+
+Output: mix symbols or separate per symbol?  
+  - File handle for every symbol, could run out of space on local machine
+    if we start asking for multiple symbols
+
+  - Mixed makes download client easier
+  - Separate makes downstream analysis more efficient
+  - Batch job to separate symbols?
+    - could start once per day then increase
+
+Schedule job for 9:15am? cloudwatch rules/ event bridge
+   - task has to know when to end
+     - GetClock api from tradier
+
+Env variables
+ --Tradier auth key : Secrets manager?
+  
+Modules
+ 1. websocket streamer
+    - input: list of symbols
+    - output: return channel w/ stream of data
+ 
+ 2. gzip writer
+    - input: stream of data
+    - output: channel of file names
+
+ 3. aws uploader
+    - input: channel of file names
+    - output: logs/metrics
+
+
+Things that can fail:
+API Calls -- 
+Tradier - setting up the connection
+Getting the key (key manager)
+
+
+* TODO extend Websocket timeout
+* DONE Pull options for underlying symbols
+* TODO Setup Infrastructure w/ CDK
+** TODO Code Repo
+** TODO Fargate + Cloudwatch timer/starter
+** TODO CloudWatch monitor for failures
+* TODO Pull tradier key from secrets manager
+* TODO Retry Websocket failures
+* DONE Gracefully close channels on SIGTERM
