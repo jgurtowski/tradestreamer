@@ -5,14 +5,14 @@ phases:
     commands:
       - echo Logging in to Amazon ECR...
       - aws ecr get-login-password --region $AWS_DEFAULT_REGION | docker login --username AWS --password-stdin $ECR_URI
-    build:
-      commands:
-        - echo Building Docker Image ...
-        - docker build -t $IMAGE_NAME:$IMAGE_TAG .
-        - docker tag $IMAGE_NAME:$IMAGE_TAG $ECR_URI/$IMAGE_NAME:$IMAGE_TAG
-    post_build:
-      commands:
-        - echo Pushing docker image...
-        - docker push $ECR_URI/$IMAGE_NAME:$IMAGE_TAG
+  build:
+    commands:
+      - echo Building Docker Image ...
+      - docker build -t $IMAGE_NAME:$IMAGE_TAG .
+      - docker tag $IMAGE_NAME:$IMAGE_TAG $ECR_URI/$IMAGE_NAME:$IMAGE_TAG
+  post_build:
+    commands:
+      - echo Pushing docker image...
+      - docker push $ECR_URI/$IMAGE_NAME:$IMAGE_TAG
         
         
