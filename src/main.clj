@@ -7,6 +7,7 @@
    [beckon]
    [s3put]
    [tradier-stream :as ts]
+   [retry]
    [bzip-chan]))
 
 (def EXIT-SLEEP-MS 10000)
@@ -44,13 +45,16 @@
   (Thread/sleep EXIT-SLEEP-MS)
   (System/exit 0))
 
-(defn -main
+(defn get-tradier-chan
   []
   (let [options-symbols (mapcat get-options SYMBOLS-FOR-OPTIONS)
         all-symbols (concat UNDERLYING-SYMBOLS options-symbols)
-        tradier-session-id (ts/get-tradier-session-id tradier-key)
-        tradier-chan (ts/get-ws-connection
-                      all-symbols tradier-session-id)
+        tradier-session-id (ts/get-tradier-session-id tradier-key)]
+    (ts/get-ws-connection all-symbols tradier-session-id)))
+     
+(defn -main
+  []
+  (let [tradier-chan (retry/ebwj-channel-keep-alive get-tradier-chan)
         tradier-chan-mult (a/mult tradier-chan)
         tradier-chan-copy (a/chan)
         tradier-chan-copy2 (a/chan)

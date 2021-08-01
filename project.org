@@ -44,5 +44,5 @@ Getting the key (key manager)
 ** TODO Fargate + Cloudwatch timer/starter
 ** TODO CloudWatch monitor for failures
 * TODO Pull tradier key from secrets manager
-* TODO Retry Websocket failures
+* DONE Retry Websocket failures
 * DONE Gracefully close channels on SIGTERM
