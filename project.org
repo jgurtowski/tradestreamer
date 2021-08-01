@@ -37,12 +37,13 @@ Tradier - setting up the connection
 Getting the key (key manager)
 
 
-* TODO extend Websocket timeout
-* DONE Pull options for underlying symbols
 * TODO Setup Infrastructure w/ CDK
 ** TODO Code Repo
 ** TODO Fargate + Cloudwatch timer/starter
 ** TODO CloudWatch monitor for failures
 * TODO Pull tradier key from secrets manager
+* TODO Start/Close for market hours
+* DONE Pull options for underlying symbols
 * DONE Retry Websocket failures
 * DONE Gracefully close channels on SIGTERM
+* TODO extend Websocket timeout
