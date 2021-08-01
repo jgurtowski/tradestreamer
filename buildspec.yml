@@ -9,10 +9,11 @@ phases:
     commands:
       - echo Building Docker Image ...
       - docker build -t $IMAGE_NAME:$IMAGE_TAG .
-      - docker tag $IMAGE_NAME:$IMAGE_TAG $ECR_URI/$IMAGE_NAME:$IMAGE_TAG
+      - docker tag $IMAGE_NAME:$IMAGE_TAG $ECR_URI/$IMAGE_TAG
+      - docker images
   post_build:
     commands:
       - echo Pushing docker image...
-      - docker push $ECR_URI/$IMAGE_NAME:$IMAGE_TAG
-        
+      - echo $ECR_URI/$IMAGE_TAG
+      - docker push $ECR_URI/$IMAGE_TAG
         
