@@ -46,4 +46,6 @@ Getting the key (key manager)
 * DONE Pull options for underlying symbols
 * DONE Retry Websocket failures
 * DONE Gracefully close channels on SIGTERM
+* DONE Move to AmazonLinux + AmazonLinux Repo public.ecr.aws/amazonlinux/amazonlinux:latest
+* TODO (Low Priority) Find a better distro to AmazonLinux (its very large)
 * TODO extend Websocket timeout

@@ -1,12 +1,12 @@
-FROM alpine:latest
+FROM public.ecr.aws/amazonlinux/amazonlinux:latest
 
 COPY install /install
 
-RUN apk update && \
-    apk add \
-    bash \
-    curl \
-    openjdk11-jre
+RUN yum -y update && \
+    yum -y install \
+    java-11-amazon-corretto-headless \
+    gzip \
+    tar 
 
 RUN bash /install/linux-install-1.10.3.855.sh
 
