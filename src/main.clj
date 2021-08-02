@@ -12,6 +12,8 @@
 
 (def EXIT-SLEEP-MS 10000)
 
+(def MARKET-STATUS-POLL-INTERVAL 300000)
+
 (def TRADE_BIN_SIZE 500000)
 
 (def UNDERLYING-SYMBOLS
@@ -21,6 +23,7 @@
   ["LADR" "PACB" "BRSP"])
 
 (def TRADIER-OPTIONS-URL "https://api.tradier.com/v1/markets/options/lookup")
+(def TRADIER-CLOCK-URL "https://api.tradier.com/v1/markets/clock")
 
 ;TODO get this from secret store
 (def tradier-key "vUv4Oy4kJQtDlkSEK3nfGKZUqQa3")
@@ -38,6 +41,17 @@
         :symbols
         (get 0)
         :options)))
+
+;TODO should really be non-blocking
+(defn get-market-status
+  []
+  (timbre/info "Fetching Market Clock")
+  (let [response (http/get TRADIER-CLOCK-URL
+                           {:headers {:Authorization (str "Bearer " tradier-key)
+                                     :Accept "application/json"}})
+        response-json (json/read-str (:body response) :key-fn keyword)]
+    (:state (:clock response-json))))
+
 
 (defn cleanup
   [chan]
@@ -69,6 +83,19 @@
             [(fn [] (cleanup tradier-chan))])
     (reset! (beckon/signal-atom "TERM")
             [(fn [] (cleanup tradier-chan))])
+
+    ;;(Leak) this continues if the chan is closed
+    ;;under normal exit
+    (a/go-loop []
+      (let [market-status (get-market-status)]
+        (if-not (or (= "premarket" market-status)
+                    (= "open" market-status))
+          (do
+            (timbre/info (str "SHUTTING DOWN Market status is: " market-status))
+            (cleanup tradier-chan))
+          (do
+            (a/<! (a/timeout MARKET-STATUS-POLL-INTERVAL))
+            (recur)))))
     
     ;spin and wait until chan closes
     (loop [c 0
