@@ -37,15 +37,16 @@ Tradier - setting up the connection
 Getting the key (key manager)
 
 
+* TODO Start/Close for market hours
 * TODO Setup Infrastructure w/ CDK
 ** TODO Code Repo
 ** TODO Fargate + Cloudwatch timer/starter
 ** TODO CloudWatch monitor for failures
 * TODO Pull tradier key from secrets manager
-* TODO Start/Close for market hours
 * DONE Pull options for underlying symbols
 * DONE Retry Websocket failures
 * DONE Gracefully close channels on SIGTERM
-* DONE Move to AmazonLinux + AmazonLinux Repo public.ecr.aws/amazonlinux/amazonlinux:latest
-* TODO (Low Priority) Find a better distro to AmazonLinux (its very large)
+* DONE Move to AmazonLinux (dockerhub limits)
+public.ecr.aws/amazonlinux/amazonlinux:latest
+* TODO (Low Priority) Find a better distro. AmazonLinux is very large
 * TODO extend Websocket timeout
