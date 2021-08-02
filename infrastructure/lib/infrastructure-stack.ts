@@ -6,6 +6,7 @@ import * as ecs from '@aws-cdk/aws-ecs';
 import * as codepipeline from '@aws-cdk/aws-codepipeline';
 import * as cpactions from '@aws-cdk/aws-codepipeline-actions';
 import * as codebuild from '@aws-cdk/aws-codebuild';
+import * as s3 from '@aws-cdk/aws-s3';
 import { Schedule } from '@aws-cdk/aws-applicationautoscaling';
 
 export class InfrastructureStack extends cdk.Stack {
@@ -64,11 +65,11 @@ export class InfrastructureStack extends cdk.Stack {
         });
 
 
-        new ecspattern.ScheduledFargateTask(this, 'TradeStreamerFargateTask',
+        const fargateTask = new ecspattern.ScheduledFargateTask(this, 'TradeStreamerFargateTask',
             {
                 schedule: Schedule.cron({
                     weekDay: "MON-FRI",
-                    hour: "1",
+                    hour: "13",
                     minute: "15"
                 }),
                 scheduledFargateTaskImageOptions: {
@@ -77,5 +78,10 @@ export class InfrastructureStack extends cdk.Stack {
                     memoryLimitMiB: 1024,
                 }
             });
+
+        const tradeDataBucket = s3.Bucket.fromBucketName(this, 'TradeDataBucket', "tradedata");
+
+        tradeDataBucket.grantReadWrite(fargateTask.taskDefinition.executionRole!.grantPrincipal);
+
     }
 }

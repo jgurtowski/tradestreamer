@@ -12,7 +12,7 @@
 
 (def EXIT-SLEEP-MS 10000)
 
-(def TRADE_BIN_SIZE 10000000)
+(def TRADE_BIN_SIZE 100000)
 
 (def UNDERLYING-SYMBOLS
   ["SPY" "LADR" "BRK/B" "PACB" "BRSP"])
@@ -61,6 +61,7 @@
         _ (a/tap tradier-chan-mult tradier-chan-copy)
         _ (a/tap tradier-chan-mult tradier-chan-copy2)
         bzipper-chan (bzip-chan/bzipper tradier-chan-copy TRADE_BIN_SIZE)]
+
     (s3put/s3-put-chan bzipper-chan "tradedata" ".ndjson.bz2")
 
     ;;setup our exit handler
