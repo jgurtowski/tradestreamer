@@ -41,15 +41,18 @@ Getting the key (key manager)
 get-options, get-clock
 * TODO Pull tradier key from secrets manager
 * TODO Find a graceful way of monitoring channel (market clock polling)
+* TODO CloudWatch monitor for failures
+* TODO Set Log Retention period
+* TODO ECR set image retention period
 * DONE Pull options for underlying symbols
 * DONE Retry Websocket failures
 * DONE Gracefully close channels on SIGTERM
 * DONE Move to AmazonLinux (dockerhub limits)
 public.ecr.aws/amazonlinux/amazonlinux:latest
 * DONE Setup Infrastructure w/ CDK
-** TODO Code Repo
-** TODO Fargate + Cloudwatch timer/starter
-** TODO CloudWatch monitor for failures
+** DONE Code Repo
+** DONE Fargate + Cloudwatch timer/starter
+
 * DONE Start/Close for market hours
 * TODO (Low Priority) Find a better distro. AmazonLinux is very large
 * TODO (Low Priority) extend Websocket timeout

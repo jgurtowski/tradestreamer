@@ -12,7 +12,10 @@
 
 (def EXIT-SLEEP-MS 10000)
 
-(def MARKET-STATUS-POLL-INTERVAL 300000)
+;TODO this is set to 20 min b/c there is a breif
+;period between premarket and open when the market is closed
+;pretty jankey
+(def MARKET-STATUS-POLL-INTERVAL 1200000)
 
 (def TRADE_BIN_SIZE 500000)
 

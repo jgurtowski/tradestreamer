@@ -82,6 +82,7 @@ export class InfrastructureStack extends cdk.Stack {
         const tradeDataBucket = s3.Bucket.fromBucketName(this, 'TradeDataBucket', "tradedata");
 
         tradeDataBucket.grantReadWrite(fargateTask.taskDefinition.executionRole!.grantPrincipal);
+        tradeDataBucket.grantReadWrite(fargateTask.taskDefinition.taskRole.grantPrincipal);
 
     }
 }
