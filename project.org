@@ -54,5 +54,6 @@ public.ecr.aws/amazonlinux/amazonlinux:latest
 ** DONE Fargate + Cloudwatch timer/starter
 
 * DONE Start/Close for market hours
+* DONE Remove NAT Gateway
 * TODO (Low Priority) Find a better distro. AmazonLinux is very large
 * TODO (Low Priority) extend Websocket timeout

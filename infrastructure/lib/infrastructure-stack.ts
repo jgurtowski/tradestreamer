@@ -7,6 +7,7 @@ import * as codepipeline from '@aws-cdk/aws-codepipeline';
 import * as cpactions from '@aws-cdk/aws-codepipeline-actions';
 import * as codebuild from '@aws-cdk/aws-codebuild';
 import * as s3 from '@aws-cdk/aws-s3';
+import * as ec2 from '@aws-cdk/aws-ec2';
 import { Schedule } from '@aws-cdk/aws-applicationautoscaling';
 
 export class InfrastructureStack extends cdk.Stack {
@@ -65,6 +66,22 @@ export class InfrastructureStack extends cdk.Stack {
         });
 
 
+        const streamerVpc = new ec2.Vpc(this, 'TradeStreamerVPC', {
+            natGateways: 0,
+            cidr: "10.0.0.0/26",
+            subnetConfiguration: [{
+                name: "TradeStreamerFargatePublicSubnet",
+                subnetType: ec2.SubnetType.PUBLIC,
+            }]
+        });
+
+        const streamerCluster = new ecs.Cluster(this, 'TradeStreamerCluster', {
+            clusterName: "TradeStreamerCluster",
+            enableFargateCapacityProviders: true,
+            vpc: streamerVpc,
+        });
+
+
         const fargateTask = new ecspattern.ScheduledFargateTask(this, 'TradeStreamerFargateTask',
             {
                 schedule: Schedule.cron({
@@ -72,11 +89,16 @@ export class InfrastructureStack extends cdk.Stack {
                     hour: "13",
                     minute: "15"
                 }),
+
                 scheduledFargateTaskImageOptions: {
                     image: ecs.ContainerImage.fromEcrRepository(ecrRepo, "latest"),
                     cpu: 256,
                     memoryLimitMiB: 1024,
-                }
+                },
+                subnetSelection: {
+                    subnetType: ec2.SubnetType.PUBLIC
+                },
+                cluster: streamerCluster,
             });
 
         const tradeDataBucket = s3.Bucket.fromBucketName(this, 'TradeDataBucket', "tradedata");
