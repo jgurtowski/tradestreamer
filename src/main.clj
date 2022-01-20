@@ -4,6 +4,7 @@
    [taoensso.timbre :as timbre]
    [clj-http.client :as http]
    [clojure.data.json :as json]
+   [cognitect.aws.client.api :as aws]
    [beckon]
    [s3put]
    [tradier-stream :as ts]
@@ -28,8 +29,13 @@
 (def TRADIER-OPTIONS-URL "https://api.tradier.com/v1/markets/options/lookup")
 (def TRADIER-CLOCK-URL "https://api.tradier.com/v1/markets/clock")
 
-;TODO get this from secret store
-(def tradier-key "vUv4Oy4kJQtDlkSEK3nfGKZUqQa3")
+(def sm-client (aws/client {:api :secretsmanager}))
+;TODO better error handling if this request fails
+(def sm-response
+  (aws/invoke sm-client {:op :GetSecretValue
+                         :request {:SecretId "TradierAPIKey"}}))
+(def tradier-key
+  (:SecretString sm-response))
 
 ;TODO move to tradier lib
 (defn get-options

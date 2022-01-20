@@ -8,11 +8,15 @@ import * as cpactions from '@aws-cdk/aws-codepipeline-actions';
 import * as codebuild from '@aws-cdk/aws-codebuild';
 import * as s3 from '@aws-cdk/aws-s3';
 import * as ec2 from '@aws-cdk/aws-ec2';
+import * as secretsmanager from '@aws-cdk/aws-secretsmanager';
+import * as iam from '@aws-cdk/aws-iam';
 import { Schedule } from '@aws-cdk/aws-applicationautoscaling';
 
 export class InfrastructureStack extends cdk.Stack {
     constructor(scope: cdk.Construct, id: string, props?: cdk.StackProps) {
         super(scope, id, props);
+
+
 
         const codeRepo = new codecommit.Repository(this, "TradeStreamerRepo", {
             repositoryName: "tradestreamer",
@@ -28,7 +32,6 @@ export class InfrastructureStack extends cdk.Stack {
             repository: codeRepo,
             output: codeCommitArtifact
         });
-
 
         const buildProject = new codebuild.PipelineProject(this, 'TradeStreamerBuildProject', {
             environment: {
@@ -106,5 +109,13 @@ export class InfrastructureStack extends cdk.Stack {
         tradeDataBucket.grantReadWrite(fargateTask.taskDefinition.executionRole!.grantPrincipal);
         tradeDataBucket.grantReadWrite(fargateTask.taskDefinition.taskRole.grantPrincipal);
 
+        const tradierKeySecret = new secretsmanager.Secret(this, 'TradierAPIKeySecret', {
+            secretName: 'TradierAPIKey'
+        });
+        tradierKeySecret.grantRead(fargateTask.taskDefinition.executionRole!.grantPrincipal);
+        tradierKeySecret.grantRead(fargateTask.taskDefinition.taskRole.grantPrincipal);
+
+        const jamesUser = iam.User.fromUserName(this, 'JamesUser', 'james');
+        tradierKeySecret.grantRead(jamesUser);
     }
 }
