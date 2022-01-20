@@ -39,7 +39,6 @@ Getting the key (key manager)
 
 * TODO Move standard tradier calls to tradier library
 get-options, get-clock
-* TODO Pull tradier key from secrets manager
 * TODO Find a graceful way of monitoring channel (market clock polling)
 * TODO CloudWatch monitor for failures
 * TODO Set Log Retention period
@@ -55,5 +54,6 @@ public.ecr.aws/amazonlinux/amazonlinux:latest
 
 * DONE Start/Close for market hours
 * DONE Remove NAT Gateway
+* DONE Pull tradier key from secrets manager
 * TODO (Low Priority) Find a better distro. AmazonLinux is very large
 * TODO (Low Priority) extend Websocket timeout
