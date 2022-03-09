@@ -1,3 +1,5 @@
+![arc](assets/tradestream.png)
+
 Design Doc: https://github.com/jgurtowski/tradestreamer/blob/master/project.org
 
 Pull streaming quotes from tradier, compress with bzip2, push to s3
